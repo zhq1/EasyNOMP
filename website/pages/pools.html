@@ -18,6 +18,7 @@
 	     		<th>Ports</th>
 	      	<th>Workers</th>
 		  		<th>Hash Rate</th>
+	     		<th>Difficulty</th>
         	<th>Fee</th>
 		<th>Donations:</th>
 	    </tr>
@@ -41,7 +42,11 @@
 				</td>
 				
 		 			<td>{{=it.stats.pools[pool].workerCount}}</td>
+				
 					<td>{{=it.stats.pools[pool].hashrateString}}</td>
+				
+					<td scope="row">{{=Number(Math.round(it.stats.pools[pool].poolStats.networkDiff + 'e' + 4) + 'e-' + 4)}}</td>
+            				
             				{{ var total = 0.0; }}
 		            		{{ var rewardRecipients = it.stats.pools[pool].rewardRecipients || {}; }}
             				{{ for (var r in rewardRecipients) { }}

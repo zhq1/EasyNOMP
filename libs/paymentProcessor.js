@@ -48,18 +48,18 @@ module.exports = function() {
         var processingConfig = poolOptions.paymentProcessing;
 
 		if (portalConfig.devmode) {
-
+			
 			processingConfig.paymentInterval = 120;
 		
 		}
-
+		
         logger.info('Payment processing setup to run every %s second(s) with daemon (%s@%s:%s) and redis (%s:%s)',
-          processingConfig.paymentInterval,
-          processingConfig.daemon.user,
-          processingConfig.daemon.host,
-          processingConfig.daemon.port,
-          poolOptions.redis.host,
-          poolOptions.redis.port);
+        processingConfig.paymentInterval,
+        processingConfig.daemon.user,
+        processingConfig.daemon.host,
+        processingConfig.daemon.port,
+        poolOptions.redis.host,
+        poolOptions.redis.port);
       });
     }
   });
