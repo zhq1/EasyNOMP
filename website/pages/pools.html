@@ -16,8 +16,11 @@
 	      	<th>Symbol</th>
 	      	<th>Algorithm</th>
 	     		<th>Ports</th>
-	      	<th>Workers</th>
+		  		<th>Net Hash Rate</th>
 		  		<th>Hash Rate</th>
+	      	<th>Workers</th>
+		  		<th>Confirmed</th>
+		  		<th>Pending</th>
 	     		<th>Difficulty</th>
         	<th>Fee</th>
 		<th>Donations:</th>
@@ -40,10 +43,16 @@
 				{{ break; }}
 				{{ } }}
 				</td>
-				
-		 			<td>{{=it.stats.pools[pool].workerCount}}</td>
+		 			
+		 			<td>{{=it.stats.pools[pool].poolStats.networkSolsString}}</td>
 				
 					<td>{{=it.stats.pools[pool].hashrateString}}</td>
+				
+		 			<td>{{=it.stats.pools[pool].workerCount}}</td>
+					
+					<td>{{=it.stats.pools[pool].blocks.confirmed}}</td>
+					
+					<td>{{=it.stats.pools[pool].blocks.pending}}</td>
 				
 					<td scope="row">{{=Number(Math.round(it.stats.pools[pool].poolStats.networkDiff + 'e' + 4) + 'e-' + 4)}}</td>
             				
