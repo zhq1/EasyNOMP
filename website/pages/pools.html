@@ -18,15 +18,21 @@
 	     		<th style="text-align:center;vertical-align: middle;">Ports</th>
 		  		<th style="text-align:center;vertical-align: middle;">Net Hash Rate</th>
 		  		<th style="text-align:center;vertical-align: middle;">Hash Rate</th>
-	      	<th style="text-align:center;vertical-align: middle;">Workers</th>
 		  		<th style="text-align:center;vertical-align: middle;">Confirmed</th>
 		  		<th style="text-align:center;vertical-align: middle;">Pending</th>
+	      	<th style="text-align:center;vertical-align: middle;">Workers</th>
 	     		<th style="text-align:center;vertical-align: middle;">Difficulty</th>
+	     		<th style="text-align:center;vertical-align: middle;">Change in</th>
         	<th style="text-align:center;vertical-align: middle;">Fee</th>
 		<th style="text-align:center;vertical-align: middle;">Donations:</th>
 	    </tr>
 	  </thead>
 	  <tbody>
+
+			{{ var sortedPools = it.stats.pools; }}	  
+	  
+			 
+	  
 			{{ for(var pool in it.stats.pools) { }}
 		   		
 				<th style="text-align:center;vertical-align: middle;">
@@ -47,14 +53,16 @@
 		 			<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].poolStats.networkSolsString}}</td>
 				
 					<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].hashrateString}}</td>
-				
-		 			<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].workerCount}}</td>
 					
 					<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].blocks.confirmed}}</td>
 					
 					<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].blocks.pending}}</td>
 				
+		 			<td style="text-align:center;vertical-align: middle;">{{=it.stats.pools[pool].workerCount}}</td>
+				
 					<td scope="row" style="text-align:center;vertical-align: middle;">{{=Number(Math.round(it.stats.pools[pool].poolStats.networkDiff + 'e' + 4) + 'e-' + 4)}}</td>
+				
+					<td scope="row" style="text-align:center;vertical-align: middle;">{{=961-(it.stats.pools[pool].poolStats.networkBlocks%960)}} blocks ({{=3*(961-(it.stats.pools[pool].poolStats.networkBlocks%960))/60}} hours)</td>
             				
             				{{ var total = 0.0; }}
 		            		{{ var rewardRecipients = it.stats.pools[pool].rewardRecipients || {}; }}
