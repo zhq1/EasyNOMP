@@ -824,11 +824,11 @@ function SetupForPool(poolOptions, setupFinished) {
 				              var paymentsData = {
 				                time: Date.now(),
 				                txid: txid,
-				                txidd: txid,
+				                txidd: txid + "-" + tmpCtrA,
 				                shares: totalShares,
 				                paid: poolOptions.paymentProcessing.maxPerPayment,
 				                miners: 1,
-				                blocks: paymentBlocks + "-" + tmpCtrA,
+				                blocks: paymentBlocks,
 						        blkid: paymentBlockID,
 				                amounts: poolOptions.paymentProcessing.maxPerPayment,
 				                balances: balanceAmounts,
@@ -886,11 +886,11 @@ function SetupForPool(poolOptions, setupFinished) {
 					              var paymentsData = {
 					                time: Date.now(),
 					                txid: txid,
-					                txidd: txid,
+					                txidd: txid + "-" + tmpCtrA,
 					                shares: totalShares,
 					                paid: tmpAmountToSend,
 					                miners: 1,
-					                blocks: paymentBlocks + "-" + tmpCtrA,
+					                blocks: paymentBlocks,
 							        blkid: paymentBlockID,
 					                amounts: tmpAmountToSend,
 					                balances: balanceAmounts,
@@ -902,7 +902,8 @@ function SetupForPool(poolOptions, setupFinished) {
 					          }, true, true);					
 					
 					}
-							
+					
+					logger.warn('PAYMENTS MADE BY PROCESSOR: %s', JSON.stringify(paymentsData));
 				
 			          // Send needs custom for each coin... Or general one like below that SHOULD work with all forks. (, false, "Miner Payment", feeAddresses, true, false)
 			          /*daemon.cmd('sendfrom', [addressAccount || '', addressb, addressAmounts[addressb], 0], function(result) {
