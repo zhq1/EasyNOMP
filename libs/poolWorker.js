@@ -218,7 +218,9 @@ module.exports = function() {
         logger.info('We thought a block was found but it was rejected by the daemon, share data: %s' + shareDataJsonStr);
       } else if (isValidBlock) {
         logger.info('Block found: %s', data.blockHash + ' by %s', data.worker);
+        logger.info('Block info: %s', JSON.stringify(data));
       }
+        
       if (isValidShare) {
         if (data.shareDiff > 1000000000) {
           logger.warn('Share was found with diff higher than 1.000.000.000!');

@@ -47,14 +47,21 @@ module.exports = function() {
         var poolOptions = poolConfigs[coin];
         var processingConfig = poolOptions.paymentProcessing;
 
+		var tmpInterval = 0;
+
 		if (portalConfig.devmode) {
 			
-			processingConfig.paymentInterval = 120;
+			tmpInterval = 120;
+		
+		}
+		else {
+
+			tmpInterval = processingConfig.paymentInterval;
 		
 		}
 		
         logger.info('Payment processing setup to run every %s second(s) with daemon (%s@%s:%s) and redis (%s:%s)',
-        processingConfig.paymentInterval,
+        tmpInterval,
         processingConfig.daemon.user,
         processingConfig.daemon.host,
         processingConfig.daemon.port,
@@ -108,9 +115,19 @@ function SetupForPool(poolOptions, setupFinished) {
           return;
         }
         try {
-          let minimumPayment = new BigNumber(processingConfig.minimumPayment);
-          logger.silly('minimumPayment = %s', minimumPayment.toString(10));
-          minPayment = minimumPayment;
+        	
+			if (portalConfig.devmode || portalConfig.disableMinimums) {
+            	let minimumPayment = new BigNumber(0);
+            }
+            else {
+            
+            	let minimumPayment = new BigNumber(processingConfig.minimumPayment);
+            
+            }
+          
+            logger.silly('minimumPayment = %s', minimumPayment.toString(10));
+            minPayment = minimumPayment;
+          
         } catch (e) {
           console.log(e);
           logger.error('Error detecting number of satoshis in a coin, cannot do payment processing. Tried parsing: %s', JSON.stringify(result.data));

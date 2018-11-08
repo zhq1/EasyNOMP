@@ -1,6 +1,10 @@
 {
     
     "poolname": "My Cool Pool",
+
+    "devmode": false,
+    
+    "disableMinimums": false,
     
     "poollogo": "",
     
@@ -61,7 +65,7 @@
         "stratumHost": "MY_SERVER_IP_OR_DOMAIN_NAME",
         "stats": {
             "updateInterval": 15,
-            "historicalRetention": 43200,
+            "historicalRetention": 95040,
             "hashrateWindow": 300
         },
         "adminCenter": {
