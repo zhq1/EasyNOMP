@@ -42,7 +42,7 @@ Please monitor those issues on GitHub. There is a temporary fix for now if you e
 ```
 Adjust the "paymentInterval" to 120 seconds or less, and set minimumPayment to 0. Then set maxPerPayment to the block reward, and work way backwards if payments still stuck.
 
-***This crypto is not lost, it is still in your pool wallet.*** Once the fix is made, you can update EasyNOMP and restart the pool, and the payments should then go through. Optionally you can manually send payments to workers. I will push the fix to parent project [1301313Y/BootNOMP](https://github.com/1301313Y/BootNOMP) and original project [foxer666/node-open-mining-portal](https://github.com/foxer666/node-open-mining-portal) when completed.
+***This crypto is not lost, it is still in your pool wallet.*** Once the fix is made, you can update EasyNOMP and restart the pool, and the payments should then go through.  I will push the fix to parent project [1301313Y/BootNOMP](https://github.com/1301313Y/BootNOMP) and original project [foxer666/node-open-mining-portal](https://github.com/foxer666/node-open-mining-portal) when completed.
 
 **This is only a temporary fix.**
 
