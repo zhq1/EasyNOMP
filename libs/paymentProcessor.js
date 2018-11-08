@@ -828,8 +828,8 @@ function SetupForPool(poolOptions, setupFinished) {
 				                shares: totalShares,
 				                paid: poolOptions.paymentProcessing.maxPerPayment,
 				                miners: 1,
-				                blocks: paymentBlocks,
-						        blkid: paymentBlockID + "-" + tmpCtrA,
+				                blocks: paymentBlocks + "-" + tmpCtrA,
+						        blkid: paymentBlockID,
 				                amounts: poolOptions.paymentProcessing.maxPerPayment,
 				                balances: balanceAmounts,
 				                work: shareAmounts
@@ -890,8 +890,8 @@ function SetupForPool(poolOptions, setupFinished) {
 					                shares: totalShares,
 					                paid: tmpAmountToSend,
 					                miners: 1,
-					                blocks: paymentBlocks,
-							        blkid: paymentBlockID + "-" + tmpCtrA,
+					                blocks: paymentBlocks + "-" + tmpCtrA,
+							        blkid: paymentBlockID,
 					                amounts: tmpAmountToSend,
 					                balances: balanceAmounts,
 					                work: shareAmounts
