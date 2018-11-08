@@ -15,8 +15,10 @@
 
     "paymentProcessing": {
         "enabled": true,
+        "paymentMode": "prop",
         "paymentInterval": 1800,
         "minimumPayment": 0.5,
+        "maxPerPayment": 5.00000000,
         "daemon": {
             "host": "127.0.0.1",
             "port": 19002,
