@@ -16,6 +16,7 @@ var Stratum = require('stratum-pool');
 var util = require('stratum-pool/lib/util.js');
 
 var api = require('./api.js');
+
 const loggerFactory = require('./logger.js');
 const logger = loggerFactory.getLogger('Website', 'system');
 
@@ -313,21 +314,41 @@ module.exports = function () {
     	
     	/* HTTP WEBSITE */
     	logger.info('Attempting to start Website on %s:%s', portalConfig.website.host,portalConfig.website.port);
+    	
         app.listen(portalConfig.website.port, portalConfig.website.host, function () {
             logger.info('Website started on %s:%s', portalConfig.website.host,portalConfig.website.port);
         });
+        /*http.createServer(app).listen(portalConfig.website.port, portalConfig.website.host, function () {
+            logger.info('Website started on %s:%s', portalConfig.website.host,portalConfig.website.port);
+        });*/
         
+                
         /* HTTPS WEBSITE */ 
         if (portalConfig.website.sslenabled) {
-        	logger.info('Attempting to start SSL Website on %s:%s', portalConfig.website.host,portalConfig.website.sslport);	       
-	        var privateKey = fs.readFileSync( portalConfig.website.sslkey );
-			var certificate = fs.readFileSync( portalConfig.website.sslcert );			
-			https.createServer({
-			    key: privateKey,
-			    cert: certificate
-			}, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
-            	logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
-        	});
+        	
+        	try {
+        		
+				logger.info('Attempting to start SSL Website on %s:%s', portalConfig.website.host,portalConfig.website.sslport);	
+				       
+				var privateKey = fs.readFileSync( portalConfig.website.sslkey );
+				var certificate = fs.readFileSync( portalConfig.website.sslcert );			
+				https.createServer({
+				    key: privateKey,
+				    cert: certificate
+				}, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
+	            	logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
+	        	});
+	        	
+	        	//https.createServer(options, app).listen(443);
+	        	
+	        }
+	        catch (e) {
+	        	
+	        	logger.error('e = %s', JSON.stringify(e));
+	        	
+	        }
+	        	
+	        	
 		}
         
     }

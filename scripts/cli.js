@@ -32,6 +32,7 @@ var client = net.connect(options.port || defaultPort, options.host || defaultHos
     else
         console.log('Socket error ' + JSON.stringify(error));
 }).on('data', function(data) {
-    console.log(data.toString());
+    //responses flood console, lets ignore them :)
+    //console.log(data.toString());
 }).on('close', function () {
 });

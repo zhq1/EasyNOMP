@@ -776,194 +776,10 @@ function SetupForPool(poolOptions, setupFinished) {
 
 
 
-
-			/* THIS !*_SHOULD_*! SEND EACH PAYMENT SEPARATELY */
-			Object.keys(addressAmounts).forEach((addressb) => {
-							
-							
-					var tmpAmountToSend = addressAmounts[addressb];		
-					var tmpCtrA = 0;		
-							
-					while (tmpAmountToSend > poolOptions.paymentProcessing.maxPerPayment) {
-					
-						logger.warn('PAYING AMOUNT %s TO ACCOUNT %s', poolOptions.paymentProcessing.maxPerPayment, addressb);					
-					
-						// SEND AMOUNT
-						daemon.cmd('sendfrom', [addressAccount || '', addressb, poolOptions.paymentProcessing.maxPerPayment.toFixed(8), 0], function(result) {
-				            //Check if payments failed because wallet doesn't have enough coins to pay for tx fees
-				            if (result.error && result.error.code === -6) {
-				              var higherPercent = withholdPercent.plus(new BigNumber(0.01));
-				              logger.warn('Not enough funds to cover the tx fees for sending out payments, decreasing rewards by %s% and retrying');
-				              trySend(higherPercent);
-				            } else if (result.error) {
-				              logger.error('Error trying to send payments with RPC sendmany %s', JSON.stringify(result.error));
-//				              callback(true);
-				            } else {
-				              // make sure sendmany gives us back a txid
-				              var txid = null;
-				              if (result.response) {
-				                txid = result.response;
-				              }
-				              if (!txid || txid == null) {
-				                logger.warn('We didn\'t get a txid from \'sendfrom\'... This could be a problem! Tried parsing: %s', JSON.stringify(result));
-				              }
-				              
-				              logger.debug('Sent out a total of ' + (totalSent) +
-				                ' to ' + Object.keys(addressAmounts).length + ' workers');
-				                
-				              if (withholdPercent.isGreaterThan(new BigNumber(0))) {
-				                logger.warn('Had to withhold ' + (withholdPercent * new BigNumber(100)).toString(10) +
-				                  '% of reward from miners to cover transaction fees. ' +
-				                  'Fund pool wallet with coins to prevent this from happening');
-				              }
-				              
-				              // save payments data to redis
-				              var paymentBlocks = rounds.filter(r => r.category == 'generate').map(r => parseInt(r.height));
-					          var paymentBlockID = rounds.filter(r => r.category == 'generate').map(r => r.blockHash);
-				              var paymentsUpdate = [];
-				              var paymentsData = {
-				                time: Date.now(),
-				                txid: txid,
-				                txidd: txid + "-" + tmpCtrA,
-				                shares: totalShares,
-				                paid: poolOptions.paymentProcessing.maxPerPayment,
-				                miners: 1,
-				                blocks: paymentBlocks,
-						        blkid: paymentBlockID,
-				                amounts: poolOptions.paymentProcessing.maxPerPayment,
-				                balances: balanceAmounts,
-				                work: shareAmounts
-				              };
-				              paymentsUpdate.push(['zadd', poolOptions.coin.name + ':payments', Date.now(), JSON.stringify(paymentsData)]);
-//				              callback(null, workers, rounds, paymentsUpdate);
-				            }
-				          }, true, true);
-						
-						// REMOVE AMOUNT FROM TOTAL :)
-						tmpAmountToSend = (tmpAmountToSend - poolOptions.paymentProcessing.maxPerPayment);
-						
-						tmpCtrA = tmpCtrA + 1;
-					
-					}
-					
-					// SEND LAST BALANCE
-					if (tmpAmountToSend > 0) {
-					
-						logger.warn('PAYING AMOUNT %s TO ACCOUNT %s', tmpAmountToSend, addressb);
-					
-							daemon.cmd('sendfrom', [addressAccount || '', addressb, tmpAmountToSend.toFixed(8), 0], function(result) {
-					            //Check if payments failed because wallet doesn't have enough coins to pay for tx fees
-					            if (result.error && result.error.code === -6) {
-					              var higherPercent = withholdPercent.plus(new BigNumber(0.01));
-					              logger.warn('Not enough funds to cover the tx fees for sending out payments, decreasing rewards by %s% and retrying');
-					              trySend(higherPercent);
-					            } else if (result.error) {
-					              logger.error('Error trying to send payments with RPC sendmany %s', JSON.stringify(result.error));
-//					              callback(true);
-					            } else {
-					              // make sure sendmany gives us back a txid
-					              var txid = null;
-					              if (result.response) {
-					                txid = result.response;
-					              }
-					              if (!txid || txid == null) {
-					                logger.warn('We didn\'t get a txid from \'sendfrom\'... This could be a problem! Tried parsing: %s', JSON.stringify(result));
-					              }
-					              
-					              logger.debug('Sent out a total of ' + (totalSent) +
-					                ' to ' + Object.keys(addressAmounts).length + ' workers');
-					                
-					              if (withholdPercent.isGreaterThan(new BigNumber(0))) {
-					                logger.warn('Had to withhold ' + (withholdPercent * new BigNumber(100)).toString(10) +
-					                  '% of reward from miners to cover transaction fees. ' +
-					                  'Fund pool wallet with coins to prevent this from happening');
-					              }
-					              
-					              // save payments data to redis
-					              var paymentBlocks = rounds.filter(r => r.category == 'generate').map(r => parseInt(r.height));
-						          var paymentBlockID = rounds.filter(r => r.category == 'generate').map(r => r.blockHash);
-					              var paymentsUpdate = [];
-					              var paymentsData = {
-					                time: Date.now(),
-					                txid: txid,
-					                txidd: txid + "-" + tmpCtrA,
-					                shares: totalShares,
-					                paid: tmpAmountToSend,
-					                miners: 1,
-					                blocks: paymentBlocks,
-							        blkid: paymentBlockID,
-					                amounts: tmpAmountToSend,
-					                balances: balanceAmounts,
-					                work: shareAmounts
-					              };
-					              paymentsUpdate.push(['zadd', poolOptions.coin.name + ':payments', Date.now(), JSON.stringify(paymentsData)]);
-//					              callback(null, workers, rounds, paymentsUpdate);
-					            }
-					          }, true, true);					
-					
-					}
-					
-					logger.warn('PAYMENTS MADE BY PROCESSOR: %s', JSON.stringify(paymentsData));
-				
-			          // Send needs custom for each coin... Or general one like below that SHOULD work with all forks. (, false, "Miner Payment", feeAddresses, true, false)
-			          /*daemon.cmd('sendfrom', [addressAccount || '', addressb, addressAmounts[addressb], 0], function(result) {
-			            //Check if payments failed because wallet doesn't have enough coins to pay for tx fees
-			            if (result.error && result.error.code === -6) {
-			              var higherPercent = withholdPercent.plus(new BigNumber(0.01));
-			              logger.warn('Not enough funds to cover the tx fees for sending out payments, decreasing rewards by %s% and retrying');
-			              trySend(higherPercent);
-			            } else if (result.error) {
-			              logger.error('Error trying to send payments with RPC sendmany %s', JSON.stringify(result.error));
-			              callback(true);
-			            } else {
-			              // make sure sendmany gives us back a txid
-			              var txid = null;
-			              if (result.response) {
-			                txid = result.response;
-			              }
-			              if (!txid || txid == null) {
-			                logger.warn('We didn\'t get a txid from \'sendfrom\'... This could be a problem! Tried parsing: %s', JSON.stringify(result));
-			              }
-			              
-			              logger.debug('Sent out a total of ' + (totalSent) +
-			                ' to ' + Object.keys(addressAmounts).length + ' workers');
-			                
-			              if (withholdPercent.isGreaterThan(new BigNumber(0))) {
-			                logger.warn('Had to withhold ' + (withholdPercent * new BigNumber(100)).toString(10) +
-			                  '% of reward from miners to cover transaction fees. ' +
-			                  'Fund pool wallet with coins to prevent this from happening');
-			              }
-			              
-			              // save payments data to redis
-			              var paymentBlocks = rounds.filter(r => r.category == 'generate').map(r => parseInt(r.height));
-				          var paymentBlockID = rounds.filter(r => r.category == 'generate').map(r => r.blockHash);
-			              var paymentsUpdate = [];
-			              var paymentsData = {
-			                time: Date.now(),
-			                txid: txid,
-			                txidd: txid,
-			                shares: totalShares,
-			                paid: addressAmounts[addressb],
-			                miners: 1,
-			                blocks: paymentBlocks,
-					        blkid: paymentBlockID,
-			                amounts: addressAmounts[addressb],
-			                balances: balanceAmounts,
-			                work: shareAmounts
-			              };
-			              paymentsUpdate.push(['zadd', poolOptions.coin.name + ':payments', Date.now(), JSON.stringify(paymentsData)]);
-			              callback(null, workers, rounds, paymentsUpdate);
-			            }
-			          }, true, true);*/
-				
-			});
-
-
-
           /* CHANGED TO INSTANTSEND (NEEDS CONFIG OPTION) */
           // Send Many needs custom for each coin... Or general one like below that SHOULD work with all forks. (, false, "Miner Payment", feeAddresses, true, false)
 
-/*          daemon.cmd('sendmany', [addressAccount || '', addressAmounts, 0], function(result) {
+          daemon.cmd('sendmany', [addressAccount || '', addressAmounts, 0], function(result) {
             //Check if payments failed because wallet doesn't have enough coins to pay for tx fees
             if (result.error && result.error.code === -6) {
               var higherPercent = withholdPercent.plus(new BigNumber(0.01));
@@ -1008,10 +824,9 @@ function SetupForPool(poolOptions, setupFinished) {
               paymentsUpdate.push(['zadd', poolOptions.coin.name + ':payments', Date.now(), JSON.stringify(paymentsData)]);
               callback(null, workers, rounds, paymentsUpdate);
             }
-          }, true, true);*/
+          }, true, true);
           
-          
-          
+                   
           
           
           
