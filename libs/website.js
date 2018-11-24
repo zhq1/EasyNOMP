@@ -322,40 +322,39 @@ module.exports = function () {
             logger.info('Website started on %s:%s', portalConfig.website.host,portalConfig.website.port);
         });*/
         
-                
-        /* HTTPS WEBSITE */ 
-        if (portalConfig.website.sslenabled) {
-        	
-        	try {
-        		
-				logger.info('Attempting to start SSL Website on %s:%s', portalConfig.website.host,portalConfig.website.sslport);	
-				       
-				var privateKey = fs.readFileSync( portalConfig.website.sslkey );
-				var certificate = fs.readFileSync( portalConfig.website.sslcert );			
-				https.createServer({
-				    key: privateKey,
-				    cert: certificate
-				}, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
-	            	logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
-	        	});
-	        	
-	        	//https.createServer(options, app).listen(443);
-	        	
-	        }
-	        catch (e) {
-	        	
-	        	logger.error('e = %s', JSON.stringify(e));
-	        	
-	        }
-	        	
-	        	
-		}
-        
     }
     catch (e) {
         logger.error('e = %s', JSON.stringify(e));
         logger.error('Could not start website on %s:%s - its either in use or you do not have permission', portalConfig.website.host,portalConfig.website.port);
     }
+    
+    
+    /* HTTPS WEBSITE */ 
+    if (portalConfig.website.sslenabled) {
+    	
+    	try {
+    		
+			logger.info('Attempting to start SSL Website on %s:%s', portalConfig.website.host,portalConfig.website.sslport);	
+			       
+			var privateKey = fs.readFileSync( portalConfig.website.sslkey );
+			var certificate = fs.readFileSync( portalConfig.website.sslcert );			
+			https.createServer({
+			    key: privateKey,
+			    cert: certificate
+			}, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
+            	logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
+        	});
+        	
+        	//https.createServer(options, app).listen(443);
+        	
+        }
+        catch (e) {        	
+	        logger.error('e = %s', JSON.stringify(e));
+	        logger.error('Could not start SSL website on %s:%s - its either in use or you do not have permission', portalConfig.website.host,portalConfig.website.sslport);
+        }
+        	
+        	
+	}
 
 
 };
