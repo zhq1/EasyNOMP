@@ -1,6 +1,8 @@
 const fs = require('fs');
 var path = require('path');
 
+//require('tls');
+const http = require('http');
 const https = require('https');
 
 var async = require('async');
@@ -314,13 +316,10 @@ module.exports = function () {
     	
     	/* HTTP WEBSITE */
     	logger.info('Attempting to start Website on %s:%s', portalConfig.website.host,portalConfig.website.port);
-    	
-        app.listen(portalConfig.website.port, portalConfig.website.host, function () {
+    	        
+        http.createServer(app).listen(portalConfig.website.port, portalConfig.website.host, function () {
             logger.info('Website started on %s:%s', portalConfig.website.host,portalConfig.website.port);
         });
-        /*http.createServer(app).listen(portalConfig.website.port, portalConfig.website.host, function () {
-            logger.info('Website started on %s:%s', portalConfig.website.host,portalConfig.website.port);
-        });*/
         
     }
     catch (e) {
@@ -337,15 +336,13 @@ module.exports = function () {
 			logger.info('Attempting to start SSL Website on %s:%s', portalConfig.website.host,portalConfig.website.sslport);	
 			       
 			var privateKey = fs.readFileSync( portalConfig.website.sslkey );
-			var certificate = fs.readFileSync( portalConfig.website.sslcert );			
-			https.createServer({
-			    key: privateKey,
-			    cert: certificate
-			}, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
-            	logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
-        	});
-        	
-        	//https.createServer(options, app).listen(443);
+			var certificate = fs.readFileSync( portalConfig.website.sslcert );
+			
+			var credentials = {key: privateKey, cert: certificate};			
+			
+			https.createServer(credentials, app).listen(portalConfig.website.sslport, portalConfig.website.host, function () {
+	            logger.info('SSL Website started on %s:%s', portalConfig.website.host,portalConfig.website.sslport);
+	        });
         	
         }
         catch (e) {        	

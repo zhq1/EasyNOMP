@@ -305,7 +305,7 @@ function SetupForPool(poolOptions, setupFinished) {
            // handle duplicates if needed
             if (duplicateFound) {
                 var dups = rounds.filter(function(round){ return round.duplicate; });
-                logger.warning('Duplicate pending blocks found: ' + JSON.stringify(dups));
+                logger.debug('Duplicate pending blocks found: ' + JSON.stringify(dups));
                 // attempt to find the invalid duplicates
                 var rpcDupCheck = dups.map(function(r){
                     return ['getblock', [r.blockHash]];
@@ -324,14 +324,14 @@ function SetupForPool(poolOptions, setupFinished) {
                         if (block && block.result) {
                             // invalid duplicate submit blocks have negative confirmations
                             if (block.result.confirmations < 0) {
-                                logger.warning('Remove invalid duplicate block %s > %s', block.result.height, block.result.hash);
+                                logger.debug('Remove invalid duplicate block %s > %s', block.result.height, block.result.hash);
                                 // move from blocksPending to blocksDuplicate...
                                 invalidBlocks.push(['smove', coin + ':blocksPending', coin + ':blocksDuplicate', dups[i].serialized]);
                             } else {
                                 // block must be valid, make sure it is unique
                                 if (validBlocks.hasOwnProperty(dups[i].blockHash)) {
                                     // not unique duplicate block
-                                    logger.warning('Remove non-unique duplicate block %s > %s', block.result.height, block.result.hash);
+                                    logger.debug('Remove non-unique duplicate block %s > %s', block.result.height, block.result.hash);
                                     // move from blocksPending to blocksDuplicate...
                                     invalidBlocks.push(['smove', coin + ':blocksPending', coin + ':blocksDuplicate', dups[i].serialized]);
                                 } else {
@@ -512,7 +512,9 @@ function SetupForPool(poolOptions, setupFinished) {
               logger.debug("Iterating worker %s", workerStr);
               //test workername is not null (those may be if miner mine on stratum without user and worker)
               if (workerStr) {
+              	
                 if (workerStr.indexOf(".") !== -1) {
+                	
                   //we have address and worker
                   logger.silly("%s worker have both payout address and worker, merging", workerStr);
                   let workerInfo = workerStr.split('.');
@@ -755,19 +757,19 @@ function SetupForPool(poolOptions, setupFinished) {
           });
 
 
-          /* THIS WILL CHARGE PORTION OF TXFEES TO POOL */
-/*          Object.keys(addressAmounts).forEach((address) => {
-              feeAddresses.push(address);// = new BigNumber(0.00000000);
-          });*/
+          /* THIS WILL CHARGE PORTION OF TXFEES TO USER */
+//          Object.keys(addressAmounts).forEach((address) => {
+//              feeAddresses.push(address);// = new BigNumber(0.00000000);
+//          });
 
 //          Object.keys(rewardAddresses).forEach((rewardaddy) => {
 //            addressAmounts[rewardaddy] = 0.00000000;
 //          });
             
             /* LIST EACH PAYEE AS PAYING FEES (WILL ADD CFG OPTION FOR THIS) */
-/*          Object.keys(rewardAddresses).forEach((feeaddy) => {
-            feeAddresses.push(feeaddy);// = 0.0;
-          });*/
+//          Object.keys(rewardAddresses).forEach((feeaddy) => {
+//            feeAddresses.push(feeaddy);// = 0.0;
+//          });
           
 
           logger.info('Ok, going to pay from "%s" address with final amounts: %s', addressAccount, JSON.stringify(addressAmounts));
@@ -779,7 +781,7 @@ function SetupForPool(poolOptions, setupFinished) {
           /* CHANGED TO INSTANTSEND (NEEDS CONFIG OPTION) */
           // Send Many needs custom for each coin... Or general one like below that SHOULD work with all forks. (, false, "Miner Payment", feeAddresses, true, false)
 
-          daemon.cmd('sendmany', [addressAccount || '', addressAmounts, 0], function(result) {
+          daemon.cmd('sendmany', [addressAccount || '', addressAmounts, 1, false, "", feeAddresses, true, false], function(result) {
             //Check if payments failed because wallet doesn't have enough coins to pay for tx fees
             if (result.error && result.error.code === -6) {
               var higherPercent = withholdPercent.plus(new BigNumber(0.01));
@@ -1001,8 +1003,8 @@ function SetupForPool(poolOptions, setupFinished) {
 
       /* WAS GETTING ISSUES WITH WORKERNAME HAVING A '.' */ 
 
-      var res = address.split(".")
-      return util.addressFromEx(poolOptions.address, res[0]);
+//      var res = address.split(".")
+      return util.addressFromEx(poolOptions.address, address);
 
     } else return address;
     return address;
