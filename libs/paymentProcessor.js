@@ -524,15 +524,12 @@ function SetupForPool(poolOptions, setupFinished) {
 
                     //todo validate by daemon
                   
-                    daemon.cmd('validateaddress', [address], function(result) {
+                    /*daemon.cmd('validateaddress', [address], function(result) {
 						if (result.error){
 						    logger.error('Error with payment processing daemon ' + JSON.stringify(result.error));
-						    callback(true);
+//						    callback('Error with payment processing daemon ' + JSON.stringify(result.error));
 						}
-						else{
-						    // do nothing
-						}
-					}, true);
+					}, true);*/
 	              
 		          // KTHXFIX-1-VALIDATION													*!*!!*!*!*!*!*!*!**!*!*!*!!**!*!*!*!*!*!**!*!*!*!*!*!**
 		          
@@ -564,23 +561,20 @@ function SetupForPool(poolOptions, setupFinished) {
 	                //todo validate by daemon
 	                let address = workerStr;      
 	                
-	                daemon.cmd('validateaddress', [address], function(result) {
+	                /*daemon.cmd('validateaddress', [address], function(result) {
 						if (result.error){
 						    logger.error('Error with payment processing daemon ' + JSON.stringify(result.error));
-						    callback(true);
+//						    callback('Error with payment processing daemon ' + JSON.stringify(result.error));
 						}
-						else{
-						    // do nothing
-						}
-					}, true);
+					}, true);*/
 		        
 					// KTHXFIX-1-VALIDATION												*!*!!*!*!*!*!*!*!**!*!*!*!!**!*!*!*!*!*!**!*!*!*!*!*!**
 	                
 	                
-	                
+	                // ATTRIBUTION OF SHARE TO THE WORKER
 					if (resultForRound[address]) {
 			
-						logger.silly("Already have balance for address %s : %s", address);	//, resultForRound[address].toString()
+						logger.silly("Already have balance for address %s : %s", address, resultForRound[address].toString(10));
 						resultForRound[address] = resultForRound[address].plus(roundShare[workerStr]);
 						logger.silly("New balance %s ", resultForRound[address].toString(10));
 			
@@ -789,7 +783,7 @@ function SetupForPool(poolOptions, setupFinished) {
               trySend(higherPercent);
             } else if (result.error) {
               logger.error('Error trying to send payments with RPC sendmany %s', JSON.stringify(result.error));
-              callback(true);
+              callback('Error trying to send payments with RPC sendmany %s', JSON.stringify(result.error));
             } else {
               // make sure sendmany gives us back a txid
               var txid = null;
@@ -957,7 +951,7 @@ function SetupForPool(poolOptions, setupFinished) {
 
         if (finalRedisCommands.length === 0) {
           logger.silly("Nothing to write to redis");
-          callback();
+          callback("Nothing to write to redis");
           return;
         }
         logger.silly("finalRedisCommands %s", finalRedisCommands);
@@ -974,18 +968,21 @@ function SetupForPool(poolOptions, setupFinished) {
             });
           }
           logger.debug("Redis have sucessfully updated after payouts");
-          callback();
+          callback("Redis updated successfully after payouts");
         });
       }
 
-    ], function() {
+    ], function(wfresult) {
 
+		logger.debug('WATERFALL RESULT: %s', wfresult);
 
-      var paymentProcessTime = Date.now() - startPaymentProcess;
-      logger.debug('Finished interval - time spent: %s ms total, %s ms redis, %s ms daemon RPC',
-        paymentProcessTime,
-        timeSpentRedis,
-        timeSpentRPC);
+		var paymentProcessTime = Date.now() - startPaymentProcess;
+		
+		logger.debug('FINISHED PAYMENT INTERVAL - time spent: %s ms total, %s ms redis, %s ms daemon RPC',
+	        paymentProcessTime,
+	        timeSpentRedis,
+	        timeSpentRPC);
+        
     });
   };
 
@@ -1003,8 +1000,8 @@ function SetupForPool(poolOptions, setupFinished) {
 
       /* WAS GETTING ISSUES WITH WORKERNAME HAVING A '.' */ 
 
-//      var res = address.split(".")
-      return util.addressFromEx(poolOptions.address, address);
+      var res = address.split(".")
+      return util.addressFromEx(poolOptions.address, res[0]);
 
     } else return address;
     return address;

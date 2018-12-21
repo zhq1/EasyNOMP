@@ -30,7 +30,9 @@ var poolConfigs;
 try {
     require('newrelic');
     if (cluster.isMaster)
-        logger.debug('New Relic initiated');
+        logger.debug('New MASTER Relic initiated PID ${process.pid}');
+    if (cluster.isWorker)
+        logger.debug('New WORKER Relic initiated PID ${process.pid}');
 } catch (e) {
 }
 
