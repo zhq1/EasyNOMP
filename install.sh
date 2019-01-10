@@ -51,6 +51,6 @@ pm2 start init.js -i max --watch --name pool
 
 
 echo "Installation completed!"
-echo "Please resume installation at the EasyNOMP Wiki: https://github.com/leshacat/EasyNOMP/wiki"
+echo "Please resume installation at the EasyNOMP Wiki: https://github.com/zhq1/EasyNOMP/wiki"
 
 exit 0
