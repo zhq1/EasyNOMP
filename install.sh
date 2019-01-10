@@ -30,6 +30,7 @@ source ~/.bashrc
 
 nvm install v8.1.4
 nvm use v8.1.4
+nvm alias default v8.1.4
 npm update -g
 
 npm install -g pm2@latest
